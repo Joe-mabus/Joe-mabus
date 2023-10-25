@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import json as js
+import numpy as np
 
 url = 'https://performance.cookcountyil.gov/resource/76gh-xye3?$limit=2000&$offset=0'
 head = {'Accept' : 'application/json', 'Host' : 'performance.cookcountyil.gov'}
@@ -11,9 +12,17 @@ reports = r.json()
 
 df = pd.DataFrame(reports)
 
-race_data = df['race'].astype('str')
+## first analysis 
 
-print(race_data.value_counts())
+from scipy.stats import chi2_contingency
+cross_tab=pd.crosstab(index=df['race'],columns=df[df['gun_related'].astype('str') == 'True'])
+
+## print(cross_tab)
+
+chi_sq_result = chi2_contingency(cross_tab,)
+p, x = chi_sq_result[1], "reject" if chi_sq_result[1] < 0.05 else "accept"
+ 
+print(f"The p-value is {chi_sq_result[1]} and hence we {x} the null Hpothesis with {chi_sq_result[2]} degrees of freedom")
 
 exit() 
 
